@@ -76,7 +76,7 @@ function get_script () {
 }
 
 function enable_wifi () {
-  setup_progress "Detecting whether to update wpa_supplicant.conf"
+  setup_progress "Detecting whether to update WiFi configuration"
   if [[ -n "$SSID" ]] && [[ -n "$WIFIPASS" ]]
   then
     if [ ! -e /boot/WIFI_ENABLED ]
@@ -85,12 +85,30 @@ function enable_wifi () {
       then
         /root/bin/remountfs_rw
       fi
-      setup_progress "Wifi variables specified, and no /boot/WIFI_ENABLED. Building wpa_supplicant.conf."
-      cp /boot/wpa_supplicant.conf.sample /boot/wpa_supplicant.conf
-      sed -i -e "sTEMPSSID${SSID}g" /boot/wpa_supplicant.conf
-      sed -i -e "sTEMPPASS${WIFIPASS}g" /boot/wpa_supplicant.conf
-      cp /boot/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf
-
+      setup_progress "Wifi variables specified, and no /boot/WIFI_ENABLED."
+      setup_progress "Checking for sample.nmconnection or wpa_supplicant.conf.sample"
+      if [ -e /boot/wpa_supplicant.conf.sample ]
+      then
+        setup_progress "Building wpa_supplicant.conf for ${SSID}"
+        cp /boot/wpa_supplicant.conf.sample /boot/wpa_supplicant.conf
+        sed -i -e "sTEMPSSID${SSID}g" /boot/wpa_supplicant.conf
+        sed -i -e "sTEMPPASS${WIFIPASS}g" /boot/wpa_supplicant.conf
+        cp /boot/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf
+      fi
+      if [ -e /boot/sample.nmconnection ]
+      then
+	local nm_dir=/etc/NetworkManager/system-connections
+	local nm_config="${SSID}.nmconnection"
+        setup_progress "Building Network Manager WiFi configuration file: $nm_config"
+        cp /boot/sample.nmconnection "/boot/$nm_config"
+	chmod 600 "/boot/$nm_config"
+        sed -i -e "sTEMPSSID${SSID}g" "/boot/$nm_config"
+        sed -i -e "sTEMPPASS${WIFIPASS}g" "/boot/$nm_config"
+	local nm_uuid=$(uuidgen)
+	sed -i -e "sTEMPUUID${nm_uuid}g" "/boot/$nm_config"
+	mkdir -p "$nm_dir"
+        cp -a "/boot/$nm_config" "${nm_dir}/$nm_config"
+      fi
       # set the host name now if possible, so it's effective immediately after the reboot
       local old_host_name
       old_host_name=$(cat /etc/hostname)
@@ -141,6 +159,7 @@ then
     /root/bin/remountfs_rw
   fi
   mv /boot/teslausb_setup_variables.conf /root/
+  chmod 600 /root/teslausb_setup_variables.conf
   dos2unix /root/teslausb_setup_variables.conf
 fi
 if [ -e "/root/teslausb_setup_variables.conf" ]
@@ -172,6 +191,7 @@ then
   if [ -e "/boot/teslausb_setup_variables.conf" ] && [ ! -e  "/root/teslausb_setup_variables.conf" ]
   then
     mv /boot/teslausb_setup_variables.conf /root/
+    chmod 600 /root/teslausb_setup_variables.conf
     dos2unix /root/teslausb_setup_variables.conf
   fi
   if [ -e "/root/teslausb_setup_variables.conf" ]

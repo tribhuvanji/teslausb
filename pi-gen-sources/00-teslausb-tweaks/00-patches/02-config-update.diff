@@ -1,10 +1,12 @@
---- stage_teslausb/rootfs/boot/config.txt
-+++ stage_teslausb/rootfs/boot/config.txt
-@@ -54,6 +54,7 @@
+--- stage_teslausb/rootfs/boot/firmware/config.txt
++++ stage_teslausb/rootfs/boot/firmware/config.txt
+@@ -43,6 +43,8 @@
+ otg_mode=1
  
- # Enable audio (loads snd_bcm2835)
- dtparam=audio=on
+ [cm5]
+-dtoverlay=dwc2,dr_mode=host
+ 
+ [all]
++#dtoverlay=dwc2,dr_mode=host
++#dtoverlay=dwc2,dr_mode=peripheral
 +dtoverlay=dwc2
- 
- [pi4]
- # Enable DRM VC4 V3D driver on top of the dispmanx display stack

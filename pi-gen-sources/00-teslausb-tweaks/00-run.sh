@@ -3,7 +3,7 @@ touch "${ROOTFS_DIR}/boot/ssh"
 install -m 666 files/userconf.txt                         "${ROOTFS_DIR}/boot/"
 install -m 755 files/rc.local                             "${ROOTFS_DIR}/etc/"
 install -m 666 files/teslausb_setup_variables.conf.sample "${ROOTFS_DIR}/boot/teslausb_setup_variables.conf"
-install -m 666 files/wpa_supplicant.conf.sample           "${ROOTFS_DIR}/boot/"
+install -m 600 files/sample.nmconnection                  "${ROOTFS_DIR}/boot/"
 install -m 666 files/run_once                             "${ROOTFS_DIR}/boot/"
 install -d "${ROOTFS_DIR}/root/bin"
 
@@ -23,7 +23,6 @@ EOF
 # disable various interactive setup dialogs
 on_chroot << EOF
 systemctl disable keyboard-setup
-systemctl disable userconfig
 EOF
 
 # Below here is the rest of the stage2 (builds the Stretch lite image)
