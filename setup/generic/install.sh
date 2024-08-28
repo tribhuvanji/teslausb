@@ -4,8 +4,15 @@
 # the main Raspberry Pi centric install scripts expect.
 #
 
+
 REPO=${REPO:-marcone}
 BRANCH=${BRANCH:-main-dev}
+
+if [[ $EUID -ne 0 ]]
+then
+  echo "STOP: Run sudo -i."
+  exit 1
+fi
 
 function error_exit {
   echo "STOP: $*"
