@@ -113,11 +113,14 @@ export CAM_SIZE=30G
 export SSID='your_ssid'
 export WIFIPASS='your_pass'
 
-# Uncomment to use ExFAT filesystem instead of FAT32.
+# STORAGE_FS: the file system of the USB storage devices as seen by the car.
+# valid options: fat32, exfat, ext4
+# The default file system for the teslaUSB storage devices is FAT32.
 # ExFAT is the filesystem used by Tesla when the drive is formatted in the car.
-# Using ExFAT is not recommended for the TeslaUSB prebuilt image, as it is
-# based on an older kernel that has no TRIM support for ExFAT.
-# export USE_EXFAT=true
+# Using ExFAT is not recommended for the TeslaUSB prebuilt storage device images
+# as ExFAT is based on an older kernel that has no TRIM support.
+export STORAGE_FS=fat32
+
 
 # Uncomment to enable a Samba/CIFS server that makes the recordings available
 # as a network share.
