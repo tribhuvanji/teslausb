@@ -15,11 +15,12 @@ case $fstype in
   vfat)
     echo vfat "utf8,umask=000,$offsetopt,$timeopt"
     ;;
-
   exfat)
     echo exfat "umask=000,$offsetopt,$timeopt"
     ;;
-
+  ext4)
+    echo "$fstype" "$offsetopt"
+    ;;
   default)
     echo "$fstype" "$offsetopt,$timeopt"
     ;;

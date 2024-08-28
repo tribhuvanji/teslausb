@@ -17,9 +17,9 @@ LIGHTSHOW_SIZE="$3"
 BOOMBOX_SIZE="$4"
 # strip trailing slash that shell autocomplete might have added
 BACKINGFILES_MOUNTPOINT="${5/%\//}"
-USE_EXFAT="$6"
+STORAGE_FS="$6"
 
-log_progress "cam: $CAM_SIZE, music: $MUSIC_SIZE, lightshow: $LIGHTSHOW_SIZE, boombox: $BOOMBOX_SIZE mountpoint: $BACKINGFILES_MOUNTPOINT, exfat: $USE_EXFAT"
+log_progress "cam: $CAM_SIZE, music: $MUSIC_SIZE, lightshow: $LIGHTSHOW_SIZE, boombox: $BOOMBOX_SIZE mountpoint: $BACKINGFILES_MOUNTPOINT, filesystem: $STORAGE_FS"
 
 function first_partition_offset () {
   local filename="$1"
@@ -82,28 +82,40 @@ function add_drive () {
   local label="$2"
   local size="$3"
   local filename="$4"
-  local useexfat="$5"
+  local storage_fs="$5"
 
   log_progress "Allocating ${size}K for $filename..."
   fallocate -l "$size"K "$filename"
-  if [ "$useexfat" = true  ]
-  then
-    echo "type=7" | sfdisk "$filename" > /dev/null
-  else
-    echo "type=c" | sfdisk "$filename" > /dev/null
-  fi
+  case "$storage_fs" in
+    exfat) echo "type=7" | sfdisk "$filename" > /dev/null ;;
+    ext4)  echo "type=L" | sfdisk "$filename" > /dev/null ;;
+    fat32) echo "type=c" | sfdisk "$filename" > /dev/null ;;
+    *)     echo "type=c" | sfdisk "$filename" > /dev/null ;;
+  esac
 
   local partition_offset
   partition_offset=$(first_partition_offset "$filename")
 
   loopdev=$(losetup_find_show -o "$partition_offset" "$filename")
   log_progress "Creating filesystem with label '$label'"
-  if [ "$useexfat" = true  ]
-  then
-    mkfs.exfat "$loopdev" -L "$label"
-  else
-    mkfs.vfat "$loopdev" -F 32 -n "$label"
-  fi
+  case "$storage_fs" in
+    exfat)
+      echo "mkfs.exfat $loopdev -L $label" 
+      mkfs.exfat "$loopdev" -L "$label"
+      ;; 	  
+    ext4)
+      echo "mkfs.ext4 $loopdev -L $label"
+      mkfs.ext4 "$loopdev" -L "$label"
+      ;;
+    fat32)
+      echo "mkfs.vfat $loopdev -F 32 -n $label"
+      mkfs.vfat "$loopdev" -F 32 -n "$label"
+      ;;
+    *)
+      echo "mkfs.vfat $loopdev -F 32 -n $label"
+      mkfs.vfat "$loopdev" -F 32 -n "$label"	
+      ;;
+  esac
   losetup -d "$loopdev"
 
   local mountpoint=/mnt/"$name"
@@ -137,7 +149,11 @@ BOOMBOX_DISK_FILE_NAME="$BACKINGFILES_MOUNTPOINT/boombox_disk.bin"
 
 # delete existing files, because fallocate doesn't shrink files, and
 # because they interfere with the percentage-of-free-space calculation
-if [ -e "$CAM_DISK_FILE_NAME" ] || [ -e "$MUSIC_DISK_FILE_NAME" ] || [ -e "$LIGHTSHOW_DISK_FILE_NAME" ] || [ -e "$BOOMBOX_DISK_FILE_NAME" ] || [ -e "$BACKINGFILES_MOUNTPOINT/snapshots" ]
+if [ -e "$CAM_DISK_FILE_NAME" ]         || \
+     [ -e "$MUSIC_DISK_FILE_NAME" ]     || \
+     [ -e "$LIGHTSHOW_DISK_FILE_NAME" ] || \
+     [ -e "$BOOMBOX_DISK_FILE_NAME" ]   || \
+     [ -e "$BACKINGFILES_MOUNTPOINT/snapshots" ]
 then
   if [ -t 0 ]
   then
@@ -168,7 +184,7 @@ rm -rf "$BACKINGFILES_MOUNTPOINT/snapshots"
 # Check if kernel supports ExFAT 
 if ! check_for_exfat_support
 then
-  if [ "$USE_EXFAT" = true ]
+  if [ "$STORAGE_FS" = xfat ]
   then
     log_progress "kernel does not support ExFAT FS. Reverting to FAT32."
     USE_EXFAT=false
@@ -181,10 +197,10 @@ else
     if ! apt install -y exfatprogs
     then
       log_progress "kernel supports ExFAT, but exfatprogs package does not exist."
-      if [ "$USE_EXFAT" = true ]
+      if [ "$STORAGE_FS" = exfat ]
       then
         log_progress "Reverting to FAT32"
-        USE_EXFAT=false
+        STORAGE_FS=fat32
       fi
     fi
   fi

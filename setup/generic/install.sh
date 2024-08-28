@@ -4,6 +4,9 @@
 # the main Raspberry Pi centric install scripts expect.
 #
 
+REPO=${REPO:-marcone}
+BRANCH=${BRANCH:-main-dev}
+
 function error_exit {
   echo "STOP: $*"
   exit 1
@@ -73,7 +76,7 @@ then
     cat <<- EOF > /etc/rc.local
 		#!/bin/bash
 		{
-		  while ! curl -s https://raw.githubusercontent.com/marcone/teslausb/main-dev/setup/generic/install.sh
+		  while ! curl -s https://raw.githubusercontent.com/${REPO}/teslausb/${BRANCH}/setup/generic/install.sh
 		  do
 		    sleep 1
 		  done
@@ -105,7 +108,7 @@ then
     fi
 
     {
-      while ! curl -s https://raw.githubusercontent.com/marcone/teslausb/main-dev/tools/debian-resizefs.sh
+      while ! curl -s https://raw.githubusercontent.com/${REPO}/teslausb/${BRANCH}/tools/debian-resizefs.sh
       do
         sleep 1
       done
@@ -138,7 +141,7 @@ fi
 # Copy the sample config file from github
 if [ ! -e /boot/teslausb_setup_variables.conf ] && [ ! -e /root/teslausb_setup_variables.conf ]
 then
-  while ! curl -o /boot/teslausb_setup_variables.conf https://raw.githubusercontent.com/marcone/teslausb/main-dev/pi-gen-sources/00-teslausb-tweaks/files/teslausb_setup_variables.conf.sample
+  while ! curl -o /boot/teslausb_setup_variables.conf https://raw.githubusercontent.com/${REPO}/teslausb/${BRANCH}/pi-gen-sources/00-teslausb-tweaks/files/teslausb_setup_variables.conf.sample
   do
     sleep 1
   done
@@ -147,7 +150,7 @@ fi
 # and the wifi config template
 if [ ! -e /boot/wpa_supplicant.conf.sample ]
 then
-  while ! curl -o /boot/wpa_supplicant.conf.sample https://raw.githubusercontent.com/marcone/teslausb/main-dev/pi-gen-sources/00-teslausb-tweaks/files/wpa_supplicant.conf.sample
+  while ! curl -o /boot/wpa_supplicant.conf.sample https://raw.githubusercontent.com/${REPO}/teslausb/${BRANCH}/pi-gen-sources/00-teslausb-tweaks/files/wpa_supplicant.conf.sample
   do
     sleep 1
   done
@@ -157,7 +160,7 @@ fi
 # continue using the regular "one step setup" process used
 # for setting up a Raspberry Pi with the prebuilt image
 rm -f /etc/rc.local
-while ! curl -o /etc/rc.local https://raw.githubusercontent.com/marcone/teslausb/main-dev/pi-gen-sources/00-teslausb-tweaks/files/rc.local
+while ! curl -o /etc/rc.local https://raw.githubusercontent.com/${REPO}/teslausb/${BRANCH}/pi-gen-sources/00-teslausb-tweaks/files/rc.local
 do
   sleep 1
 done
@@ -211,7 +214,7 @@ then
 	  echo "| /boot/teslausb_setup_variables.conf with your favorite                 |"
 	  echo "| editor, e.g. 'nano /boot/teslausb_setup_variables.conf' and fill in    |"
 	  echo "| the required variables. Instructions are in the file, and at           |"
-	  echo "| https://github.com/marcone/teslausb/blob/main-dev/doc/OneStepSetup.md  |"
+	  echo "| https://github.com/${REPO}/teslausb/blob/${BRANCH}/doc/OneStepSetup.md  |"
 	  echo "| (though ignore the Raspberry Pi specific bits about flashing and       |"
 	  echo "| mounting the sd card on a PC)                                          |"
 	  echo "|                                                                        |"
