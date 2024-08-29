@@ -13,15 +13,15 @@ timeopt="time_offset=-420"
 
 case $fstype in
   vfat)
-    echo vfat "utf8,umask=000,$offsetopt,$timeopt"
+    echo "vfat utf8,umask=000,$offsetopt,$timeopt"
     ;;
   exfat)
-    echo exfat "umask=000,$offsetopt,$timeopt"
+    echo "exfat umask=000,$offsetopt,$timeopt"
     ;;
   ext4)
-    echo "$fstype" "$offsetopt"
+    echo "ext4 $offsetopt"
     ;;
   default)
-    echo "$fstype" "$offsetopt,$timeopt"
+    echo "$fstype  $offsetopt,$timeopt"
     ;;
 esac

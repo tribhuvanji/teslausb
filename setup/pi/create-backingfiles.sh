@@ -217,7 +217,7 @@ MUSIC_DISK_SIZE="$(calc_size "$MUSIC_SIZE")"
 LIGHTSHOW_DISK_SIZE="$(calc_size "$LIGHTSHOW_SIZE")"
 BOOMBOX_DISK_SIZE="$(calc_size "$BOOMBOX_SIZE")"
 
-add_drive "cam" "CAM" "$CAM_DISK_SIZE" "$CAM_DISK_FILE_NAME" "$USE_EXFAT"
+add_drive "cam" "CAM" "$CAM_DISK_SIZE" "$CAM_DISK_FILE_NAME" "$STORAGE_FS"
 log_progress "created camera backing file"
 
 REMAINING_SPACE="$(available_space)"
@@ -232,7 +232,7 @@ fi
 
 if [ "$REMAINING_SPACE" -ge 1024 ] && [ "$MUSIC_DISK_SIZE" -gt 0 ]
 then
-  add_drive "music" "MUSIC" "$MUSIC_DISK_SIZE" "$MUSIC_DISK_FILE_NAME" "$USE_EXFAT"
+  add_drive "music" "MUSIC" "$MUSIC_DISK_SIZE" "$MUSIC_DISK_FILE_NAME" "$STORAGE_FS"
   log_progress "created music backing file"
 fi
 
@@ -245,7 +245,7 @@ fi
 
 if [ "$REMAINING_SPACE" -ge 1024 ] && [ "$LIGHTSHOW_DISK_SIZE" -gt 0 ]
 then
-  add_drive "lightshow" "LIGHTSHOW" "$LIGHTSHOW_DISK_SIZE" "$LIGHTSHOW_DISK_FILE_NAME" "$USE_EXFAT"
+  add_drive "lightshow" "LIGHTSHOW" "$LIGHTSHOW_DISK_SIZE" "$LIGHTSHOW_DISK_FILE_NAME" "$STORAGE_FS"
   log_progress "created lightshow backing file"
 fi
 
@@ -258,7 +258,7 @@ fi
 
 if [ "$REMAINING_SPACE" -ge 1024 ] && [ "$BOOMBOX_DISK_SIZE" -gt 0 ]
 then
-  add_drive "boombox" "BOOMBOX" "$BOOMBOX_DISK_SIZE" "$BOOMBOX_DISK_FILE_NAME" "$USE_EXFAT"
+  add_drive "boombox" "BOOMBOX" "$BOOMBOX_DISK_SIZE" "$BOOMBOX_DISK_FILE_NAME" "$STORAGE_FS"
   log_progress "created boombox backing file"
 fi
 
