@@ -100,19 +100,19 @@ function add_drive () {
   log_progress "Creating filesystem with label '$label'"
   case "$storage_fs" in
     exfat)
-      echo "mkfs.exfat $loopdev -L $label" 
+      log_progress "mkfs.exfat $loopdev -L $label" 
       mkfs.exfat "$loopdev" -L "$label"
       ;; 	  
     ext4)
-      echo "mkfs.ext4 $loopdev -L $label"
+      log_progress "mkfs.ext4 $loopdev -L $label"
       mkfs.ext4 "$loopdev" -L "$label"
       ;;
     fat32)
-      echo "mkfs.vfat $loopdev -F 32 -n $label"
+      log_progress "mkfs.vfat $loopdev -F 32 -n $label"
       mkfs.vfat "$loopdev" -F 32 -n "$label"
       ;;
     *)
-      echo "mkfs.vfat $loopdev -F 32 -n $label"
+      log_progress "mkfs.vfat $loopdev -F 32 -n $label"
       mkfs.vfat "$loopdev" -F 32 -n "$label"	
       ;;
   esac
